@@ -8,9 +8,6 @@ import sys
 import os
 import yaml
 
-access_key = 'access_key'
-secret_key = 'secret_key'
-
 
 def parseopts():
     arguementparser = argparse.ArgumentParser()
@@ -50,6 +47,18 @@ def upload(options):
         if not os.path.isfile(file):
             print('{} is not a file'.format(file))
             continue
+
+        key = os.path.basename(file)
+
+        print('upload key:{}'.format(key))
+
+        token = q.upload_token(options.bucket, key, 3600)
+
+        ret, info = put_file(token, key, file)
+        print(info)
+
+        assert ret['key'] == key
+        assert ret['hash'] == etag(file)
 
 
 def main():
